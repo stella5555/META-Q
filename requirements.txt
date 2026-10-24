@@ -1,5 +1,5 @@
-streamlit
+fastapi
+uvicorn[standard]
 qiskit
 qiskit-aer
 numpy
-plotly

@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laboratorio Q</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- PORTADA -->
+<section class="screen on" id="s-portada">
+ <div class="portada">
+  <div class="criostato"><i style="width:70px"></i><i style="width:130px"></i><i style="width:110px"></i><i style="width:90px"></i><i style="width:60px"></i><b></b></div>
+  <div class="titulo">LABORATORIO Q</div>
+  <div class="sub">Mide, estima y aprende computación cuántica</div>
+  
+  <div class="caja" style="max-width:640px;margin:0 auto 22px;text-align:left"><div class="guia" id="guia-portada"></div></div>
+  <div class="menu">
+   <button class="btn" onclick="ir('mapa')">JUGAR</button>
+   <button class="btn azul" onclick="ir('ranking')">RANKING</button>
+   <button class="btn gris" onclick="ir('como')">CÓMO SE JUEGA</button>
+  </div>
+  <p class="motor" id="motor"></p>
+ </div>
+</section>
+
+<!-- COMO SE JUEGA -->
+<section class="screen" id="s-como">
+ <div class="top"><div class="h2">CÓMO SE JUEGA</div><button class="btn gris" onclick="ir('portada')">VOLVER</button></div>
+ <div class="caja" style="line-height:1.25">
+  <p>1. Eres practicante en un laboratorio cuántico. El criostato tiene 9 qubits.</p>
+  <p>2. Tu misión: encontrar qubits en estado |1⟩ (activos). Tienes pocas mediciones.</p>
+  <p>3. Antes de medir, cada qubit está en <b>superposición</b>: tiene algo de 0 y algo de 1. Al <b>medirlo</b>, Qiskit decide en ese instante si sale 0 o 1.</p>
+  <p>4. Tu puntaje premia decidir bien, no la suerte: elegir un qubit con 90% de probabilidad de 1 vale más que acertar de casualidad en uno de 10%.</p>
+  <p>5. Al terminar, verás qué aprendiste y en qué te equivocaste.</p>
+ </div>
+</section>
+
+<!-- MAPA -->
+<section class="screen" id="s-mapa">
+ <div class="top"><div class="h2">EXPERIMENTOS</div><button class="btn gris" onclick="ir('portada')">INICIO</button></div>
+ <div class="caja"><div class="guia" id="guia-mapa"></div></div>
+ <div class="mapa" id="mapa"></div>
+</section>
+
+<!-- LECCION -->
+<section class="screen" id="s-leccion">
+ <div class="top"><div class="h2" id="l-tit"></div><button class="btn gris" onclick="ir('mapa')">VOLVER</button></div>
+ <div class="caja"><div class="guia" id="guia-lec"></div></div>
+ <div class="grid2" style="margin-top:14px">
+  <div class="caja" id="l-idea"></div>
+  <div class="qpanel" id="l-sale"></div>
+ </div>
+ <div class="caja" style="margin-top:14px" id="l-como"></div>
+ <div class="menu barra-fija"><button class="btn" id="l-go">EMPEZAR EXPERIMENTO</button></div>
+</section>
+
+<!-- JUEGO -->
+<section class="screen" id="s-juego">
+ <div class="hud">
+  <div class="chip" id="c-nivel"></div>
+  <div class="chip">MEDICIONES <span id="c-palas"></span></div>
+  <div class="chip" id="chip-mon">ENERGÍA <span id="c-mon"></span></div>
+  <div class="chip">PUNTOS <span id="c-pts"></span></div>
+  <button class="btn gris" style="font-size:9px;padding:8px" onclick="ir('mapa')">SALIR</button>
+ </div>
+ <div class="juego">
+  <div class="izq"><div class="huaca"><div class="escalon">CRIOSTATO · 15 mK</div><div class="tablero" id="tablero"></div></div><div class="caja guia-abajo"><div class="guia" id="guia-juego"></div></div></div>
+  <div class="lado">
+   <div class="qpanel" id="qpanel"></div>
+   <div class="acciones">
+    <button class="btn azul" id="b-radar" onclick="radar()">ESCANEAR x5</button>
+    <button class="btn" id="b-cavar" onclick="cavar()">MEDIR</button>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- RESUMEN -->
+<section class="screen" id="s-resumen">
+ <div class="top"><div class="h2">RESUMEN DEL EXPERIMENTO</div></div>
+ <div class="grid2">
+  <div class="caja">
+   <div class="px" style="font-size:10px;color:#d9c8f0">PUNTAJE</div>
+   <div class="puntaje" id="r-pts"></div>
+   <div class="estrellas px" id="r-est" style="font-size:18px;margin:8px 0"></div>
+   <div class="guia" id="guia-res"></div>
+  </div>
+  <div class="qpanel" id="r-mapeo"></div>
+ </div>
+ <div class="caja" style="margin-top:14px">
+  <div class="px" style="font-size:12px;color:var(--morado-ibm)">TUS DECISIONES</div>
+  <table class="tabla" id="r-tabla"></table>
+ </div>
+ <div class="qpanel" style="margin-top:14px" id="r-llevar"></div>
+ <div class="caja" style="margin-top:14px" id="r-fallos"></div>
+ <div class="menu" style="margin-top:16px">
+  <button class="btn" onclick="jugar(nivel)">REINTENTAR</button>
+  <button class="btn azul" id="r-sig" onclick="jugar(nivel+1)">SIGUIENTE EXPERIMENTO</button>
+  <button class="btn rosa" onclick="ir('ranking')">VER RANKING</button>
+  <button class="btn gris" onclick="ir('mapa')">EXPERIMENTOS</button>
+ </div>
+</section>
+
+<!-- RANKING -->
+<section class="screen" id="s-ranking">
+ <div class="top"><div class="h2">RANKING</div><button class="btn gris" onclick="ir('portada')">INICIO</button></div>
+ <div class="tabs" id="r-tabs"></div>
+ <div class="caja"><table class="tabla rank" id="r-rank"></table></div>
+ <p class="motor">Temporada de octubre · Liga de plata · Las ligas se reinician cada mes.</p>
+</section>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/game.js"></script>
+</body>
+</html>
