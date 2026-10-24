@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Huacas - Aprende QML Jugando</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #D8E9F8; color: #111827; }
+        .clay-card {
+            background-color: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+            border: 3px solid #B8A9E6;
+        }
+        .btn-play {
+            background-color: #FF69B4;
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-play:hover {
+            background-color: #FF1493;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(255, 105, 180, 0.4);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 sm:p-8">
+
+    <main class="clay-card max-w-4xl w-full p-8 sm:p-12 text-center relative overflow-hidden">
+        <!-- Personaje animado decorativo -->
+        <img src="assets/personaje_normal.gif" alt="Inti el Arqueólogo" class="w-24 h-24 mx-auto mb-4 drop-shadow-lg">
+        
+        <h1 class="text-4xl sm:text-5xl font-extrabold mb-4 tracking-tight">
+            🏺 Quantum <span class="text-[#FF69B4]">Huacas</span>
+        </h1>
+        
+        <p class="text-lg sm:text-xl text-gray-700 mb-8 max-w-2xl mx-auto font-medium">
+            De la probabilidad clásica al Quantum Machine Learning. Excava tumbas, utiliza simulaciones de Monte Carlo y domina la superposición cuántica en un reto diario.
+        </p>
+
+        <!-- Mapeo Cuántico Breve -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+            <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                <div class="text-2xl mb-2">✨</div>
+                <h3 class="font-bold">Probabilidad</h3>
+                <p class="text-sm text-gray-600">Rotación de Qubits</p>
+            </div>
+            <div class="bg-purple-50 p-4 rounded-xl border border-purple-100">
+                <div class="text-2xl mb-2">⛏️</div>
+                <h3 class="font-bold">Excavar</h3>
+                <p class="text-sm text-gray-600">Medición Cuántica</p>
+            </div>
+            <div class="bg-pink-50 p-4 rounded-xl border border-pink-100">
+                <div class="text-2xl mb-2">🔗</div>
+                <h3 class="font-bold">Conexiones</h3>
+                <p class="text-sm text-gray-600">Entrelazamiento</p>
+            </div>
+        </div>
+
+        <!-- Botón de acción (Cambiar URL por tu link de Streamlit) -->
+        <a href="https://quantum-huacas.streamlit.app" target="_blank" 
+           class="btn-play inline-block text-white font-bold text-lg sm:text-xl px-10 py-4 rounded-2xl">
+           🎮 Jugar la Huaca del Día
+        </a>
+        
+        <p class="mt-6 text-sm text-gray-500 font-semibold">
+            Track EdTech • IBM Quantum Hackathon 2026
+        </p>
+    </main>
+
+</body>
+</html>
