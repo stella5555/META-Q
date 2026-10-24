@@ -1,75 +1,183 @@
 import streamlit as st
 import numpy as np
 import datetime
-from quantum_logic import dig_tomb, run_radar_monte_carlo
+import os
+from qiskit import QuantumCircuit
+from qiskit_aer import AerSimulator
 
-st.set_page_config(page_title="Huaca Cuántica", layout="centered", page_icon="🏺")
+# Configuración inicial de la página
+st.set_page_config(page_title="Quantum Huacas", layout="centered", page_icon="🏺")
 
-st.title("🏺 La Huaca Cuántica (Q-Huaca)")
-st.caption("Aprende Probabilidad, Monte Carlo y Superposición Cuántica explorando la huaca diaria.")
+# Inyección de CSS para estilo Cozy / Pixel Art (Paleta Oficial de la Hackathon)
+st.markdown("""
+<style>
+    /* Fondo principal celeste pastel */
+    .stApp { background-color: #D8E9F8; }
+    
+    /* Tipografía y color base */
+    h1, h2, h3, p, span { color: #111827 !important; font-family: 'Poppins', sans-serif; }
+    
+    /* Tarjetas de tumbas flotantes */
+    .tumba-card {
+        background-color: #FFFFFF;
+        border-radius: 16px;
+        padding: 15px;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        text-align: center;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        border: 2px solid #B8A9E6;
+        margin-bottom: 15px;
+    }
+    .tumba-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+    }
+    
+    /* Botones principales estilo Rosa Chicle */
+    .stButton>button {
+        background-color: #FF69B4;
+        color: white !important;
+        border-radius: 12px;
+        border: none;
+        font-weight: bold;
+        transition: background-color 0.3s;
+        width: 100%;
+    }
+    .stButton>button:hover {
+        background-color: #FF1493;
+        border: none;
+    }
+    
+    /* Cuadro de diálogo del personaje */
+    .dialog-box {
+        background-color: #FFFFFF;
+        border-left: 6px solid #FF69B4;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-weight: 500;
+    }
+</style>
+""", unsafe_allow_html=True)
 
-# Semilla fija diaria (tipo Wordle)
-today_seed = int(datetime.date.today().strftime("%Y%m%d"))
-np.random.seed(today_seed)
+# Simulador Cuántico
+sim = AerSimulator()
+
+def crear_circuito_tumba(p):
+    theta = 2 * np.arcsin(np.sqrt(np.clip(p, 0.0, 1.0)))
+    qc = QuantumCircuit(1, 1)
+    qc.ry(theta, 0)
+    qc.measure(0, 0)
+    return qc
+
+def excavar_qubit(p):
+    qc = crear_circuito_tumba(p)
+    return '1' in sim.run(qc, shots=1).result().get_counts()
+
+def radar_monte_carlo(p, escaneos=10):
+    qc = crear_circuito_tumba(p)
+    return sim.run(qc, shots=escaneos).result().get_counts().get('1', 0), escaneos
+
+def excavar_par_entrelazado(p):
+    theta = 2 * np.arcsin(np.sqrt(np.clip(p, 0.0, 1.0)))
+    qc = QuantumCircuit(2, 2)
+    qc.ry(theta, 0)
+    qc.cx(0, 1)
+    qc.measure([0, 1], [0, 1])
+    estado = list(sim.run(qc, shots=1).result().get_counts().keys())[0]
+    return estado == '11', estado == '11'
 
 # Inicialización de estado
+np.random.seed(int(datetime.date.today().strftime("%Y%m%d")))
+
 if "palas" not in st.session_state:
     st.session_state.palas = 3
     st.session_state.monedas = 30
-    st.session_state.tesoros_encontrados = 0
+    st.session_state.score = 0
     st.session_state.tumbas_abiertas = [False] * 9
     st.session_state.resultados = [None] * 9
-    # Probabilidades ocultas de tesoro para 9 tumbas
-    st.session_state.probabilidades = np.random.uniform(0.15, 0.85, 9).round(2)
+    st.session_state.probabilidades = [0.90, 0.20, 0.60, 0.10, 0.75, 0.40, 0.30, 0.50, 0.85]
+    st.session_state.entrelazadas = (0, 4)
+    st.session_state.mensaje_inti = "¡Hola! Cada cofre esconde un qubit en superposición. ¡Usa tus palas y el radar cuántico con sabiduría!"
 
-# Métricas del juego
-col_a, col_b, col_c = st.columns(3)
-col_a.metric("⛏️ Palas restantes", st.session_state.palas)
-col_b.metric("🪙 Monedas (Radar)", st.session_state.monedas)
-col_c.metric("🏆 Tesoros hallados", st.session_state.tesoros_encontrados)
+# Función para cargar imágenes con respaldo de emojis
+def renderizar_imagen(nombre_archivo, emoji_fallback, width=100):
+    ruta = os.path.join("assets", nombre_archivo)
+    if os.path.exists(ruta):
+        st.image(ruta, width=width, use_container_width=True)
+    else:
+        st.markdown(f"<div style='font-size: 50px;'>{emoji_fallback}</div>", unsafe_allow_html=True)
+
+# Encabezado y Diálogo
+col_logo, col_dialogo = st.columns([1, 4])
+with col_logo:
+    # AQUI CAMBIAMOS A .gif
+    renderizar_imagen("personaje_normal.gif", "🐹", width=80)
+with col_dialogo:
+    st.markdown(f"<div class='dialog-box'>🗣️ {st.session_state.mensaje_inti}</div>", unsafe_allow_html=True)
+
+# Marcadores
+c1, c2, c3 = st.columns(3)
+c1.metric("⛏️ Palas Restantes", st.session_state.palas)
+c2.metric("🪙 Monedas (Radar)", st.session_state.monedas)
+c3.metric("⭐ Puntaje", st.session_state.score)
 
 st.write("---")
-st.subheader("Cuadrante de la Huaca (9 Tumbas)")
 
-# Cuadrícula 3x3 de tumbas
-for row in range(3):
+# Tablero Visual 3x3
+for f in range(3):
     cols = st.columns(3)
-    for col in range(3):
-        idx = row * 3 + col
-        with cols[col]:
-            prob = st.session_state.probabilidades[idx]
-            brillo = int(prob * 100)
+    for c in range(3):
+        i = f * 3 + c
+        with cols[c]:
+            prob = st.session_state.probabilidades[i]
+            es_entrelazada = i in st.session_state.entrelazadas
+            link_badge = "🔗" if es_entrelazada else ""
             
-            if st.session_state.tumbas_abiertas[idx]:
-                if st.session_state.resultados[idx]:
-                    st.success("💎 ¡Tesoro!")
+            # Contenedor visual de la tumba
+            st.markdown(f"<div class='tumba-card'>", unsafe_allow_html=True)
+            
+            if st.session_state.tumbas_abiertas[i]:
+                if st.session_state.resultados[i]:
+                    # AQUI CAMBIAMOS A tesoro_abierto.jpg
+                    renderizar_imagen("tesoro_abierto.jpg", "💎")
+                    st.success("¡Tesoro!")
                 else:
-                    st.error("🪨 Vacía")
+                    # AQUI CAMBIAMOS A tierra_vacia.jpg
+                    renderizar_imagen("tierra_vacia.jpg", "🪨")
+                    st.error("Vacía")
             else:
-                st.info(f"✨ Brillo: {brillo}%")
+                # AQUI CAMBIAMOS A tesoro_cerrado.jpg
+                renderizar_imagen("tesoro_cerrado.jpg", "🟫")
+                st.markdown(f"**Tumba {i+1} {link_badge}**")
+                st.progress(prob, text=f"Brillo: {int(prob*100)}%")
                 
-                # Botón de cavar (Medición del qubit)
-                if st.button(f"Cavar #{idx+1}", key=f"dig_{idx}", disabled=st.session_state.palas <= 0):
-                    encontrado = dig_tomb(prob)
-                    st.session_state.tumbas_abiertas[idx] = True
-                    st.session_state.resultados[idx] = encontrado
-                    st.session_state.palas -= 1
-                    if encontrado:
-                        st.session_state.tesoros_encontrados += 1
-                    st.rerun()
+                c_btn1, c_btn2 = st.columns(2)
+                with c_btn1:
+                    if st.button("⛏️", key=f"exc_{i}", help="Excavar (Medición)", disabled=st.session_state.palas <= 0):
+                        st.session_state.score += int(prob * 100)
+                        if es_entrelazada:
+                            t1, t2 = st.session_state.entrelazadas
+                            h1, h2 = excavar_par_entrelazado(prob)
+                            st.session_state.tumbas_abiertas[t1], st.session_state.tumbas_abiertas[t2] = True, True
+                            st.session_state.resultados[t1], st.session_state.resultados[t2] = h1, h2
+                            if h1: st.session_state.score += 40
+                            st.session_state.mensaje_inti = "¡Increíble! Colapsaste un estado entrelazado. Ambas tumbas reaccionaron al instante."
+                        else:
+                            hallado = excavar_qubit(prob)
+                            st.session_state.tumbas_abiertas[i] = True
+                            st.session_state.resultados[i] = hallado
+                            if hallado: st.session_state.score += 20
+                            st.session_state.mensaje_inti = "¡Pum! Medición ejecutada. La superposición ha colapsado."
+                        st.session_state.palas -= 1
+                        st.rerun()
                 
-                # Botón de radar (Monte Carlo experimental)
-                if st.button(f"📡 Radar (-10🪙)", key=f"radar_{idx}", disabled=st.session_state.monedas < 10):
-                    positivos, total = run_radar_monte_carlo(prob, shots=10)
-                    st.session_state.monedas -= 10
-                    st.toast(f"Tumba #{idx+1}: {positivos}/{total} señales detectadas en Monte Carlo")
-                    st.rerun()
-
-st.write("---")
-# Explicación pedagógica visible para el jurado
-with st.expander("🎓 ¿Cómo funciona la ciencia detrás de este juego?"):
-    st.markdown("""
-    * **Brillo = Ángulo de Rotación ($\theta$):** Define la probabilidad teórica de encontrar el tesoro antes de cavar.
-    * **Cavar = Medición Cuántica:** Mientras no cavas, el qubit está en superposición. Al cavar, el circuito colapsa a $|0\rangle$ (vacía) o $|1\rangle$ (tesoro).
-    * **Radar = Simulación Monte Carlo:** Realiza muestreos repetidos rápidos para obtener una aproximación empírica de la probabilidad sin alterar el estado final.
-    """)
+                with c_btn2:
+                    if st.button("📡", key=f"rad_{i}", help="Radar (-2🪙)", disabled=st.session_state.monedas < 2):
+                        h, t = radar_monte_carlo(prob, 10)
+                        st.session_state.monedas -= 2
+                        st.session_state.score = max(0, st.session_state.score - 2)
+                        st.session_state.mensaje_inti = f"Radar completado (Monte Carlo): {h} señales en {t} escaneos rápidos."
+                        st.rerun()
+            
+            st.markdown("</div>", unsafe_allow_html=True)
